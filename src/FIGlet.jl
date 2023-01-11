@@ -1,6 +1,6 @@
 module FIGlet
 
-using Pkg.Artifacts
+using Comonicon, Pkg.Artifacts
 import Base
 
 include.([
@@ -11,6 +11,6 @@ include.([
     "banner.jl"
 ])
 
-export availablefonts, render, generate_output
+export command_main
 
 end

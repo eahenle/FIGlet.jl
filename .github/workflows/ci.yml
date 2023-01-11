@@ -1,17 +1,10 @@
 name: CI
-on: [push]
+on:
+  workflow_dispatch:
+  
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        os:
-          - ubuntu-latest
-          - macOS-latest
-          - windows-latest
-        arch:
-          - x64
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: julia-actions/setup-julia@latest
