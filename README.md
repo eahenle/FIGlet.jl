@@ -1,19 +1,3 @@
-```
-                 ███████████ █████   █████████  ████            █████            ███  ████
-                ░░███░░░░░░█░░███   ███░░░░░███░░███           ░░███            ░░░  ░░███
-                 ░███   █ ░  ░███  ███     ░░░  ░███   ██████  ███████          █████ ░███
-                 ░███████    ░███ ░███          ░███  ███░░███░░░███░          ░░███  ░███
-                 ░███░░░█    ░███ ░███    █████ ░███ ░███████   ░███            ░███  ░███
-                 ░███  ░     ░███ ░░███  ░░███  ░███ ░███░░░    ░███ ███        ░███  ░███
-                 █████       █████ ░░█████████  █████░░██████   ░░█████  ██     ░███  █████
-                ░░░░░       ░░░░░   ░░░░░░░░░  ░░░░░  ░░░░░░     ░░░░░  ░░      ░███ ░░░░░
-                                                                            ███ ░███
-                                                                           ░░██████
-                                                                            ░░░░░░
-```
+My fork of [FIGlet.jl](https://github.com/kdheepak/FIGlet.jl) for ASCII banner creation.
 
-
-My fork of [FIGlet.jl](https://github.com/kdheepak/FIGlet.jl) for ASCII banner curation.
-
-This way, `FIGlet` isn't a dependency of other packages; 
-desirable because `Pkg`-registered `FIGlet` won't build on Windows anymore!
+Use CLI scripts (.sh/.bat) to generate FIGlet outputs.
