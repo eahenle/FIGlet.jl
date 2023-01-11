@@ -1,13 +1,1 @@
-*.jl.*.cov
-*.jl.cov
-*.jl.mem
-.DS_Store
-/Manifest.toml
-/dev/
-/docs/build/
-/docs/site/
-/deps/FIGletFonts-0.5.0/
-/deps/build.log
-/deps/downloads/
-/deps/manifests/
-
+Manifest.toml

@@ -1,43 +1,32 @@
-using FIGlet
-using Test
+using FIGlet, Test
 
-function generate_output(s::AbstractString, font::AbstractString="Standard")
-    fontpath = FIGlet.getfontpath(font)
-    io = IOContext(IOBuffer())
-    FIGlet.render(io, s, FIGlet.readfont(fontpath))
-    jl_output = String(take!(io.io))
-    cli_output = read(`figlet -f $fontpath $s`, String)
+@testset verbose=true "FIGlet.jl" begin
 
-    return strip(join(strip.(split(jl_output, '\n')), '\n')), strip(join(strip.(split(cli_output, '\n')), '\n'))
+@testset "Stuff" begin
+iob = IOBuffer(b"flf2a", read=true);
+@test FIGlet.readmagic(iob) == UInt8['f', 'l', 'f', '2', 'a']
+@test FIGlet.FIGletHeader('$', 6, 5, 16, 15, 11) == FIGlet.FIGletHeader('$', 6, 5, 16, 15, 11, 0, 143, 0)
+@test availablefonts() |> length == 680
+
+@test all(isa.(FIGlet.readfont.(availablefonts()), FIGlet.FIGletFont))
+
+ff = FIGlet.readfont("jiskan16")
+iob = IOBuffer()
+print(iob, ff)
+@test String(take!(iob)) == "FIGletFont(n=7098)"
+
+iob = IOBuffer()
+print(iob, ff.font_characters['㙤'])
+@test String(take!(iob)) == "FIGletChar(ord='㙤')"
+
+@test_throws FIGlet.FontNotFoundError FIGlet.readfont("wat")
+@test_throws FIGlet.FontError FIGlet.readfont(joinpath(@__DIR__, "..", "README.md"))
 end
 
-@testset "FIGlet.jl" begin
-    iob = IOBuffer(b"flf2a", read=true);
-    @test FIGlet.readmagic(iob) == UInt8['f', 'l', 'f', '2', 'a']
-
-    @test FIGlet.FIGletHeader('$', 6, 5, 16, 15, 11) == FIGlet.FIGletHeader('$', 6, 5, 16, 15, 11, 0, 143, 0)
-
-    @test FIGlet.availablefonts() |> length == 680
-
-    for font in FIGlet.availablefonts()
-        @test FIGlet.readfont(font) isa FIGlet.FIGletFont
-    end
-
-    ff = FIGlet.readfont("jiskan16")
-    iob = IOBuffer()
-    print(iob, ff)
-    @test String(take!(iob)) == "FIGletFont(n=7098)"
-
-    iob = IOBuffer()
-    print(iob, ff.font_characters['㙤'])
-    @test String(take!(iob)) == "FIGletChar(ord='㙤')"
-
-    @test_throws FIGlet.FontNotFoundError FIGlet.readfont("wat")
-    @test_throws FIGlet.FontError FIGlet.readfont(joinpath(@__DIR__, "..", "README.md"))
-
-    iob = IOBuffer()
-    FIGlet.render(iob, "the quick brown fox jumps over the lazy dog", "standard")
-    @test String(take!(iob)) == raw"""
+@testset "Rendering" begin
+iob = IOBuffer()
+render(iob, "the quick brown fox jumps over the lazy dog", "standard")
+@test String(take!(iob)) == raw"""
  _   _                        _      _      _
 | |_| |__   ___    __ _ _   _(_) ___| | __ | |__  _ __ _____      ___ __
 | __| '_ \ / _ \  / _` | | | | |/ __| |/ / | '_ \| '__/ _ \ \ /\ / / '_ \
@@ -62,7 +51,7 @@ end
 """
 
     iob = IOBuffer()
-    FIGlet.render(iob, uppercase("the quick brown fox jumps over the lazy dog"), "standard")
+    render(iob, uppercase("the quick brown fox jumps over the lazy dog"), "standard")
     @test String(take!(iob)) == raw"""
  _____ _   _ _____    ___  _   _ ___ ____ _  __
 |_   _| | | | ____|  / _ \| | | |_ _/ ___| |/ /
@@ -95,7 +84,7 @@ end
 """
 
     iob = IOBuffer()
-    FIGlet.render(iob, "the quick brown fox jumps over the lazy dog", "mirror")
+    render(iob, "the quick brown fox jumps over the lazy dog", "mirror")
     @test String(take!(iob)) == raw"""
                               _      _      _                        _   _
    __ ___      _____ __ _  __| | __ | |___ (_)_   _ _ __    ___   __| |_| |
@@ -120,9 +109,9 @@ end
 
 """
 
-    iob = IOBuffer()
-    FIGlet.render(iob, uppercase("the quick brown fox jumps over the lazy dog"), "mirror")
-    @test String(take!(iob)) == raw"""
+iob = IOBuffer()
+render(iob, uppercase("the quick brown fox jumps over the lazy dog"), "mirror")
+@test String(take!(iob)) == raw"""
  __  _ ____ ___ _   _  ___    _____ _   _ _____
  \ \| |___ \_ _| | | |/ _ \  |____ | | | |_   _|
   \ ` |   | | || | | | | | |   |_  | |_| | | |
@@ -152,22 +141,24 @@ end
 
 
 """
+end
 
-    @testset "Render all fonts" begin
-
-        for (i, font) in enumerate(FIGlet.availablefonts())
-            try
-                iob = IOBuffer()
-                sentence = "the quick brown fox jumps over the lazy dog"
-                FIGlet.render(iob, sentence, font)
-                FIGlet.render(iob, uppercase(sentence), font)
-                @test length(String(take!(iob))) > 0
-            catch
-                println("Cannot render font: number = $i, name = \"$font\"")
-            end
+@testset "Fonts" begin
+    pass = true
+    for (i, font) in enumerate(availablefonts())
+        try
+            iob = IOBuffer()
+            sentence = "the quick brown fox jumps over the lazy dog"
+            render(iob, sentence, font)
+            render(iob, uppercase(sentence), font)
+            @assert length(String(take!(iob))) > 0
+        catch
+            println("Cannot render font: number = $i, name = \"$font\"")
+            pass = false
         end
-
     end
+    @test pass
+end
 
 end
 
